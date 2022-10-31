@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/woodpecker-ci/woodpecker/server/plugins/encrypted_secrets"
 	"net/url"
 	"os"
 	"strings"
@@ -159,7 +160,11 @@ func setupQueue(c *cli.Context, s store.Store) queue.Queue {
 }
 
 func setupSecretService(c *cli.Context, s store.Store) model.SecretService {
-	return secrets.New(c.Context, s)
+	if c.String("secrets-encryption-keyset") != "" {
+		return encrypted_secrets.New(c, s)
+	} else {
+		return secrets.New(c.Context, s)
+	}
 }
 
 func setupRegistryService(c *cli.Context, s store.Store) model.RegistryService {
