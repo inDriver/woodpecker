@@ -50,6 +50,7 @@ var allBeans = []interface{}{
 	new(model.Sender),
 	new(model.Task),
 	new(model.User),
+	new(model.ServerConfig),
 }
 
 type migrations struct {
