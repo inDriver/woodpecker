@@ -36,12 +36,12 @@ func New(c *cli.Context, s store.Store) model.SecretService {
 	return &builtin{encryption, secretsService, s}
 }
 
-func (b *builtin) SecretListPipeline(repo *model.Repo, pipeline *model.Pipeline) ([]*model.Secret, error) {
-	result, err := b.secrets.SecretListPipeline(repo, pipeline)
+func (b *builtin) SecretFind(repo *model.Repo, name string) (*model.Secret, error) {
+	result, err := b.secrets.SecretFind(repo, name)
 	if err != nil {
 		return nil, err
 	}
-	b.decryptSecretList(result)
+	b.decryptSecret(result)
 	return result, nil
 }
 
@@ -54,48 +54,12 @@ func (b *builtin) SecretList(repo *model.Repo) ([]*model.Secret, error) {
 	return result, nil
 }
 
-func (b *builtin) OrgSecretList(owner string) ([]*model.Secret, error) {
-	result, err := b.secrets.OrgSecretList(owner)
+func (b *builtin) SecretListBuild(repo *model.Repo, build *model.Build) ([]*model.Secret, error) {
+	result, err := b.secrets.SecretListBuild(repo, build)
 	if err != nil {
 		return nil, err
 	}
 	b.decryptSecretList(result)
-	return result, nil
-}
-
-func (b *builtin) GlobalSecretList() ([]*model.Secret, error) {
-	result, err := b.secrets.GlobalSecretList()
-	if err != nil {
-		return nil, err
-	}
-	b.decryptSecretList(result)
-	return result, nil
-}
-
-func (b *builtin) SecretFind(repo *model.Repo, name string) (*model.Secret, error) {
-	result, err := b.secrets.SecretFind(repo, name)
-	if err != nil {
-		return nil, err
-	}
-	b.decryptSecret(result)
-	return result, nil
-}
-
-func (b *builtin) OrgSecretFind(owner, name string) (*model.Secret, error) {
-	result, err := b.secrets.OrgSecretFind(owner, name)
-	if err != nil {
-		return nil, err
-	}
-	b.decryptSecret(result)
-	return result, nil
-}
-
-func (b *builtin) GlobalSecretFind(owner string) (*model.Secret, error) {
-	result, err := b.secrets.GlobalSecretFind(owner)
-	if err != nil {
-		return nil, err
-	}
-	b.decryptSecret(result)
 	return result, nil
 }
 
@@ -104,41 +68,13 @@ func (b *builtin) SecretCreate(repo *model.Repo, in *model.Secret) error {
 	return b.secrets.SecretCreate(repo, in)
 }
 
-func (b *builtin) OrgSecretCreate(owner string, in *model.Secret) error {
-	b.encryptSecret(in)
-	return b.secrets.OrgSecretCreate(owner, in)
-}
-
-func (b *builtin) GlobalSecretCreate(in *model.Secret) error {
-	b.encryptSecret(in)
-	return b.secrets.GlobalSecretCreate(in)
-}
-
 func (b *builtin) SecretUpdate(repo *model.Repo, in *model.Secret) error {
 	b.encryptSecret(in)
 	return b.secrets.SecretUpdate(repo, in)
 }
 
-func (b *builtin) OrgSecretUpdate(owner string, in *model.Secret) error {
-	b.encryptSecret(in)
-	return b.secrets.OrgSecretUpdate(owner, in)
-}
-
-func (b *builtin) GlobalSecretUpdate(in *model.Secret) error {
-	b.encryptSecret(in)
-	return b.secrets.GlobalSecretUpdate(in)
-}
-
 func (b *builtin) SecretDelete(repo *model.Repo, name string) error {
 	return b.secrets.SecretDelete(repo, name)
-}
-
-func (b *builtin) OrgSecretDelete(owner, name string) error {
-	return b.secrets.OrgSecretDelete(owner, name)
-}
-
-func (b *builtin) GlobalSecretDelete(name string) error {
-	return b.secrets.GlobalSecretDelete(name)
 }
 
 // internals
@@ -160,7 +96,6 @@ func (b *builtin) decryptSecret(secret *model.Secret) {
 		secret.Value = reencryptedValue
 		err := b.store.SecretUpdate(secret)
 		if err != nil {
-			// May fail, so ignore
 			log.Warn().Err(err).Msgf("Failed to rotate encryption on secret ID=%d: could not save to DB", secret.ID)
 		}
 	}
