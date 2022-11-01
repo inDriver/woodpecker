@@ -12,12 +12,14 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568
 	github.com/franela/goblin v0.0.0-20211003143422-0a4f594942bf
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogits/go-gogs-client v0.0.0-20210131175652-1d7215cd8d85
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/golangci/golangci-lint v1.44.2
 	github.com/google/go-github/v39 v39.2.0
+	github.com/google/tink/go v1.7.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.4
@@ -79,7 +81,6 @@ require (
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fzipp/gocyclo v0.4.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-critic/go-critic v0.6.2 // indirect
@@ -99,7 +100,7 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/golang/snappy v0.0.3 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
 	github.com/golangci/go-misc v0.0.0-20180628070357-927a3d87b613 // indirect

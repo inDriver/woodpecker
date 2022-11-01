@@ -17,6 +17,7 @@ package encrypted_secrets
 import (
 	"encoding/base64"
 	"errors"
+	"github.com/woodpecker-ci/woodpecker/server/store/datastore"
 	"os"
 	"strconv"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"github.com/woodpecker-ci/woodpecker/server/store"
-	"github.com/woodpecker-ci/woodpecker/server/store/types"
 )
 
 type Encryption struct {
@@ -153,7 +153,7 @@ func (svc *Encryption) reloadEncryption() {
 // and to detect keyset rotations
 func (svc *Encryption) validateKeyset() {
 	ciphertextSample, err := svc.store.ServerConfigGet("secrets-encryption-key-id")
-	if errors.Is(err, types.RecordNotExist) {
+	if errors.Is(err, datastore.RecordNotExist) {
 		svc.updateCiphertextSample()
 		return
 	} else if err != nil {
