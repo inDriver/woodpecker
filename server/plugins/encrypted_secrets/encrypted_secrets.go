@@ -15,24 +15,25 @@
 package encrypted_secrets
 
 import (
-	"strconv"
-
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"github.com/woodpecker-ci/woodpecker/server/model"
 	"github.com/woodpecker-ci/woodpecker/server/plugins/secrets"
 	"github.com/woodpecker-ci/woodpecker/server/store"
 )
 
+// wraps secret service and adds encryption to values
 type builtin struct {
 	encryption Encryption
 	secrets    model.SecretService
 	store      store.Store
 }
 
+// New returns a new local secret service with encrypted secret storage
 func New(c *cli.Context, s store.Store) model.SecretService {
 	encryption := newEncryptionService(c, s)
 	secretsService := secrets.New(c.Context, s)
+	attachKeysetRotationWatcher(&encryption)
+
 	return &builtin{encryption, secretsService, s}
 }
 
@@ -41,7 +42,7 @@ func (b *builtin) SecretFind(repo *model.Repo, name string) (*model.Secret, erro
 	if err != nil {
 		return nil, err
 	}
-	b.decryptSecret(result)
+	b.encryption.decryptSecret(result)
 	return result, nil
 }
 
@@ -50,7 +51,7 @@ func (b *builtin) SecretList(repo *model.Repo) ([]*model.Secret, error) {
 	if err != nil {
 		return nil, err
 	}
-	b.decryptSecretList(result)
+	b.encryption.decryptSecretList(result)
 	return result, nil
 }
 
@@ -59,17 +60,17 @@ func (b *builtin) SecretListBuild(repo *model.Repo, build *model.Build) ([]*mode
 	if err != nil {
 		return nil, err
 	}
-	b.decryptSecretList(result)
+	b.encryption.decryptSecretList(result)
 	return result, nil
 }
 
 func (b *builtin) SecretCreate(repo *model.Repo, in *model.Secret) error {
-	b.encryptSecret(in)
+	b.encryption.encryptSecret(in)
 	return b.secrets.SecretCreate(repo, in)
 }
 
 func (b *builtin) SecretUpdate(repo *model.Repo, in *model.Secret) error {
-	b.encryptSecret(in)
+	b.encryption.encryptSecret(in)
 	return b.secrets.SecretUpdate(repo, in)
 }
 
@@ -78,32 +79,3 @@ func (b *builtin) SecretDelete(repo *model.Repo, name string) error {
 }
 
 // internals
-func (b *builtin) encryptSecret(secret *model.Secret) {
-	encryptedValue := b.encryption.encrypt(secret.Value, strconv.Itoa(int(secret.ID)))
-	secret.Value = encryptedValue
-}
-
-func (b *builtin) encryptSecretList(secrets []*model.Secret) {
-	for _, secret := range secrets {
-		b.decryptSecret(secret)
-	}
-}
-
-func (b *builtin) decryptSecret(secret *model.Secret) {
-	decryptedValue := b.encryption.decrypt(secret.Value, strconv.Itoa(int(secret.ID)))
-	reencryptedValue := b.encryption.encrypt(decryptedValue, strconv.Itoa(int(secret.ID)))
-	if secret.Value != reencryptedValue {
-		secret.Value = reencryptedValue
-		err := b.store.SecretUpdate(secret)
-		if err != nil {
-			log.Warn().Err(err).Msgf("Failed to rotate encryption on secret ID=%d: could not save to DB", secret.ID)
-		}
-	}
-	secret.Value = decryptedValue
-}
-
-func (b *builtin) decryptSecretList(secrets []*model.Secret) {
-	for _, secret := range secrets {
-		b.decryptSecret(secret)
-	}
-}
