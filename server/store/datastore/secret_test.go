@@ -86,6 +86,17 @@ func TestSecretList(t *testing.T) {
 	assert.Len(t, list, 2)
 }
 
+func TestSecretListAll(t *testing.T) {
+	store, closer := newTestStore(t, new(model.Secret))
+	defer closer()
+
+	createTestSecrets(t, store)
+
+	list, err := store.SecretListAll()
+	assert.NoError(t, err)
+	assert.Len(t, list, 4)
+}
+
 func TestSecretUpdate(t *testing.T) {
 	store, closer := newTestStore(t, new(model.Secret))
 	defer closer()
@@ -161,4 +172,25 @@ func TestSecretIndexes(t *testing.T) {
 	}); err == nil {
 		t.Errorf("Unexpected error: duplicate name")
 	}
+}
+
+func createTestSecrets(t *testing.T, store *storage) {
+	assert.NoError(t, store.SecretCreate(&model.Secret{
+		Name:  "usr",
+		Value: "sec",
+	}))
+	assert.NoError(t, store.SecretCreate(&model.Secret{
+		RepoID: 1,
+		Name:   "foo",
+		Value:  "bar",
+	}))
+	assert.NoError(t, store.SecretCreate(&model.Secret{
+		RepoID: 1,
+		Name:   "baz",
+		Value:  "qux",
+	}))
+	assert.NoError(t, store.SecretCreate(&model.Secret{
+		Name:  "global",
+		Value: "val",
+	}))
 }

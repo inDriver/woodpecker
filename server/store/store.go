@@ -113,6 +113,7 @@ type Store interface {
 	// Secrets
 	SecretFind(*model.Repo, string) (*model.Secret, error)
 	SecretList(*model.Repo) ([]*model.Secret, error)
+	SecretListAll() ([]*model.Secret, error)
 	SecretCreate(*model.Secret) error
 	SecretUpdate(*model.Secret) error
 	SecretDelete(*model.Secret) error
@@ -154,6 +155,7 @@ type Store interface {
 	// ServerConfig
 	ServerConfigGet(string) (string, error)
 	ServerConfigSet(string, string) error
+	ServerConfigDelete(string) error
 
 	// Store operations
 	Ping() error
