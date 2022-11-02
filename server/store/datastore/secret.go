@@ -31,6 +31,11 @@ func (s storage) SecretList(repo *model.Repo) ([]*model.Secret, error) {
 	return secrets, s.engine.Where("secret_repo_id = ?", repo.ID).Find(&secrets)
 }
 
+func (s storage) SecretListAll() ([]*model.Secret, error) {
+	var secrets []*model.Secret
+	return secrets, s.engine.Find(&secrets)
+}
+
 func (s storage) SecretCreate(secret *model.Secret) error {
 	// only Insert set auto created ID back to object
 	_, err := s.engine.Insert(secret)
