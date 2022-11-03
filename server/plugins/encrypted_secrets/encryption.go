@@ -74,7 +74,7 @@ func (svc *Encryption) encryptSecret(secret *model.Secret) {
 
 func (svc *Encryption) encryptSecretList(secrets []*model.Secret) {
 	for _, secret := range secrets {
-		svc.decryptSecret(secret)
+		svc.encryptSecret(secret)
 	}
 }
 
