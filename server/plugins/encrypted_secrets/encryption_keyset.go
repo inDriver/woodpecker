@@ -49,6 +49,7 @@ func (svc *Encryption) validateKeyset() {
 	if errors.Is(err, datastore.RecordNotExist) {
 		svc.updateCiphertextSample()
 		log.Warn().Msg("Secrets encryption enabled on server")
+		svc.encryptDatabase()
 		return
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("Invalid secrets encryption key")
@@ -61,6 +62,7 @@ func (svc *Encryption) validateKeyset() {
 	} else if plaintext != svc.primaryKeyId {
 		svc.updateCiphertextSample()
 		log.Info().Msg("Registered rotated secrets encryption key")
+		svc.reEncryptDatabase()
 	}
 }
 
