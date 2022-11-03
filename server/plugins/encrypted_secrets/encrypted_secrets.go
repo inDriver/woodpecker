@@ -85,5 +85,3 @@ func (b *builtin) SecretUpdate(repo *model.Repo, in *model.Secret) error {
 func (b *builtin) SecretDelete(repo *model.Repo, name string) error {
 	return b.secrets.SecretDelete(repo, name)
 }
-
-// internals
