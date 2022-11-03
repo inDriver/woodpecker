@@ -32,7 +32,6 @@ type builtin struct {
 func New(c *cli.Context, s store.Store) model.SecretService {
 	encryption := newEncryptionService(c, s)
 	secretsService := secrets.New(c.Context, s)
-	attachKeysetRotationWatcher(&encryption)
 
 	return &builtin{encryption, secretsService, s}
 }
