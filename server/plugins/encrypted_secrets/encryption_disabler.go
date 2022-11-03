@@ -10,7 +10,7 @@ import (
 func DecryptAll(ctx *cli.Context, s store.Store) {
 	filepath := ctx.String("secrets-encryption-decrypt-all-keyset")
 
-	service := Encryption{s, nil, "", filepath}
+	service := Encryption{s, nil, "", filepath, nil}
 	service.initEncryption()
 	service.decryptDatabase()
 	err := service.store.ServerConfigDelete("secrets-encryption-key-id")
