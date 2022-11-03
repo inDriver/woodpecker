@@ -525,4 +525,17 @@ var flags = []cli.Flag{
 		Hidden:  true,
 		// TODO(485) temporary workaround to not hit api rate limits
 	},
+	//
+	// secrets encryption in DB
+	//
+	&cli.StringFlag{
+		EnvVars: []string{"WOODPECKER_SECRETS_ENCRYPTION_KEYSET_FILE"},
+		Name:    "secrets-encryption-keyset",
+		Usage:   "Google tink DAEAD-compatible keyset to encrypt secrets in DB",
+	},
+	&cli.StringFlag{
+		EnvVars: []string{"WOODPECKER_SECRETS_DECRYPT_ALL_KEYSET_FILE"},
+		Name:    "secrets-encryption-decrypt-all-keyset",
+		Usage:   "Google tink DAEAD-compatible keyset to decrypt all secrets in database and disable secrets encryption on server",
+	},
 }

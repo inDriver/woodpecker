@@ -1,4 +1,3 @@
-// Copyright 2022 Woodpecker Authors
 // Copyright 2018 Drone.IO Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +26,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/woodpecker-ci/woodpecker/server/plugins/encrypted_secrets"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -165,6 +166,26 @@ func setupQueue(c *cli.Context, s store.Store) queue.Queue {
 }
 
 func setupSecretService(c *cli.Context, s store.Store) model.SecretService {
+	_, err := s.ServerConfigGet("secrets-encryption-key-id")
+	encryptionEnabled := errors.Is(err, types.RecordNotExist)
+	decryptionKeysetProvided := c.IsSet("secrets-encryption-decrypt-all-keyset")
+	keysetProvided := c.IsSet("secrets-encryption-keyset")
+
+	if keysetProvided {
+		if decryptionKeysetProvided {
+			log.Fatal().Msg("Secret service config conflict: you should specify either encryption or decryption keyset, " +
+				"not the both ones")
+		}
+		return encrypted_secrets.New(c, s)
+	}
+
+	if encryptionEnabled {
+		if !decryptionKeysetProvided {
+			log.Fatal().Msg("Failed to initialize secret service: secrets are encrypted but no keyset provided")
+		}
+		encrypted_secrets.DecryptAll(c, s)
+	}
+
 	return secrets.New(c.Context, s)
 }
 
