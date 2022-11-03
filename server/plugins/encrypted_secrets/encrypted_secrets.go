@@ -75,7 +75,7 @@ func (b *builtin) SecretCreate(repo *model.Repo, in *model.Secret) error {
 
 	in.Value = value
 	b.encryption.encryptSecret(in)
-	return b.secrets.SecretCreate(repo, in)
+	return b.secrets.SecretUpdate(repo, in)
 }
 
 func (b *builtin) SecretUpdate(repo *model.Repo, in *model.Secret) error {
