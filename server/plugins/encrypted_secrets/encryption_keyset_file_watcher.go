@@ -37,7 +37,7 @@ func (svc *keysetWatcher) handleFileEvents() {
 			if !ok {
 				log.Fatal().Msg("Error watching encryption keyset file changes")
 			}
-			if event.Op == fsnotify.Write {
+			if (event.Op == fsnotify.Write) || (event.Op == fsnotify.Create) {
 				log.Warn().Msgf("Changes detected in encryption keyset file: '%s'. Encryption service will be reloaded", event.Name)
 				svc.encryption.initEncryption()
 			}
