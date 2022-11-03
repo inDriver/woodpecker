@@ -19,10 +19,7 @@ func (svc *Encryption) initEncryption() {
 		log.Fatal().Err(err).Msgf("Error opening secret encryption keyset file")
 	}
 	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			return
-		}
+		_ = file.Close()
 	}(file)
 
 	jsonKeyset := keyset.NewJSONReader(file)

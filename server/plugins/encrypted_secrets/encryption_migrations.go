@@ -15,6 +15,7 @@ func (svc *Encryption) encryptDatabase() {
 	log.Warn().Msg("All secrets are encrypted")
 }
 
+// Re-encrypt database after key rotations
 func (svc *Encryption) reEncryptDatabase() {
 	log.Warn().Msg("Re-encrypting all secrets in database")
 	for _, secret := range svc.fetchAllSecrets() {
@@ -25,7 +26,7 @@ func (svc *Encryption) reEncryptDatabase() {
 	log.Warn().Msg("All secrets are re-encrypted")
 }
 
-// Decrypt database and disable encryption in server config
+// Decrypt database
 func (svc *Encryption) decryptDatabase() {
 	log.Warn().Msg("Decrypting all secrets")
 	for _, secret := range svc.fetchAllSecrets() {
