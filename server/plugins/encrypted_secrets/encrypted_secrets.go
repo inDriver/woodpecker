@@ -65,6 +65,15 @@ func (b *builtin) SecretListBuild(repo *model.Repo, build *model.Build) ([]*mode
 }
 
 func (b *builtin) SecretCreate(repo *model.Repo, in *model.Secret) error {
+	//save with empty value to obtain ID, which is required to properly encrypt value
+	value := in.Value
+	in.Value = ""
+	err := b.secrets.SecretCreate(repo, in)
+	if err != nil {
+		return err
+	}
+
+	in.Value = value
 	b.encryption.encryptSecret(in)
 	return b.secrets.SecretCreate(repo, in)
 }
