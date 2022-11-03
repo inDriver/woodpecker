@@ -16,6 +16,7 @@ package encrypted_secrets
 
 import (
 	"encoding/base64"
+	"github.com/fsnotify/fsnotify"
 	"github.com/woodpecker-ci/woodpecker/server/model"
 	"strconv"
 
@@ -26,17 +27,19 @@ import (
 )
 
 type Encryption struct {
-	store          store.Store
-	encryption     tink.DeterministicAEAD
-	primaryKeyId   string
-	keysetFilePath string
+	store             store.Store
+	encryption        tink.DeterministicAEAD
+	primaryKeyId      string
+	keysetFilePath    string
+	keysetFileWatcher *fsnotify.Watcher
 }
 
 func newEncryptionService(ctx *cli.Context, s store.Store) Encryption {
 	filepath := ctx.String("secrets-encryption-keyset")
 
-	result := Encryption{s, nil, "", filepath}
+	result := Encryption{s, nil, "", filepath, nil}
 	result.initEncryption()
+	result.initFileWatcher()
 
 	return result
 }
