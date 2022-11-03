@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -170,7 +171,14 @@ func setupSecretService(c *cli.Context, s store.Store) model.SecretService {
 	} else if c.IsSet("secrets-encryption-keyset") {
 		return encrypted_secrets.New(c, s)
 	}
-	return secrets.New(c.Context, s)
+
+	_, err := s.ServerConfigGet("secrets-encryption-key-id")
+	if errors.Is(err, datastore.RecordNotExist) {
+		return secrets.New(c.Context, s)
+	} else {
+		log.Fatal().Msg("Failed to initialize secret service: secrets are encrypted but no encryption key provided")
+		return nil
+	}
 }
 
 func setupRegistryService(c *cli.Context, s store.Store) model.RegistryService {
