@@ -167,7 +167,7 @@ func setupQueue(c *cli.Context, s store.Store) queue.Queue {
 
 func setupSecretService(c *cli.Context, s store.Store) model.SecretService {
 	_, err := s.ServerConfigGet("secrets-encryption-key-id")
-	encryptionEnabled := errors.Is(err, types.RecordNotExist)
+	encryptionEnabled := err == nil
 	decryptionKeysetProvided := c.IsSet("secrets-encryption-decrypt-all-keyset")
 	keysetProvided := c.IsSet("secrets-encryption-keyset")
 
